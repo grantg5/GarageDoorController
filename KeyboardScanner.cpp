@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include "KeyboardScanner.hpp"
 #include <iostream>
 #include <string>
@@ -18,3 +19,21 @@ Event KeyboardScanner::scanInput() {
             return Event('n', "NoEvent");
     }
 }
+=======
+#include <iostream>
+#include <thread>
+using namespace std;
+
+class InputScanner {
+    int scanInput() {
+        while (1) {
+            char input;
+            cin >> input;
+
+            
+        }
+
+        return 0;
+    }
+}
+>>>>>>> 48b4fa8eb874bea94648a94488ad3735a821693d
