@@ -2,8 +2,12 @@
 #include <pthread.h>
 
 int main() {
-    pthread_t thread1;
-    pthread_create(&thread1, NULL, InputScanner::scan, NULL);
+    pthread_t keyboardScannerThread;
+    pthread_t inputScannerThread;
+    pthread_t gdcThread;
+    pthread_create(&keyboardScannerThread, NULL, KeyboardScanner::scanInput, NULL);
+    pthread_create(&inputScannerThread, NULL, InputScanner::scan, NULL);
+    pthread_create(&gdcThread, NULL, Context::run, NULL);
 
     return 0;
 }

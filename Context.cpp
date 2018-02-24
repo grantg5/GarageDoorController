@@ -2,6 +2,12 @@
 
 Context::Context(): motorUp(false), motorDown(false), infraredBeam(false) {}
 
+void * Context::run(void *arg) {
+	while(1) {
+
+	}
+}
+
 void Context::acceptEvent(Event event) {
 	//TODO: Fill out
 }
