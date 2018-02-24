@@ -4,6 +4,7 @@ State::State(string nameIn, vector<Transition*> transitionsIn): name(nameIn), tr
 
 void State::entry(){
 	//TODO: Fill in
+	//PROBLEM? How to have seperate entry & exit functions for each state?
 }
 
 void State::exit() {

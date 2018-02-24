@@ -8,11 +8,10 @@ using namespace std;
 
 Context::Context(): motorUp(false), motorDown(false), infraredBeam(false) {}
 
-void * Context::run(void *arg) {
+void Context::setupStateTable() {
 	map<string, State*> states;
 
 	//Closed
-	//TODO: Instanciate vector, put stuff in.
 	vector<Transition*> stateClosedTransitionVector(1);
 	stateClosedTransitionVector.push_back(new Transition("ButtonPress", "StateOpening"));
 	states.insert(make_pair("StateClosed", new State("StateClosed", stateClosedTransitionVector)));
@@ -47,15 +46,17 @@ void * Context::run(void *arg) {
 	statePausedClosingTransitionVector.push_back(new Transition("ButtonPress", "StateOpening"));
 	states.insert(make_pair("StatePausedClosing", new State("StatePausedClosing", statePausedClosingTransitionVector)));
 
-	StateTable stateTable = StateTable(states, "StateClosed");
+	stateTable = StateTable(states, "StateClosed");
+}
 
+void * Context::run(void *arg) {
 	while(1) {
 
 	}
 }
 
 void Context::acceptEvent(Event event) {
-	//TODO: Fill out
+	stateTable.acceptEvent(event);
 }
 
 void Context::startTimer(int position) {

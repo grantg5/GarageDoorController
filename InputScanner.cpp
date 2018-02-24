@@ -9,5 +9,7 @@ void * InputScanner::scan(void *arg) {
 		Event inputEvent = keyScanner.scanInput();
 		cout << inputEvent.keyPressed;
 		cout << inputEvent.eventName;
+
+		//TODO: Talk w/ Kadeer on how events get sent to context.
 	}
 }

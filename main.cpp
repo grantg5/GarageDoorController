@@ -5,6 +5,9 @@
 #include <pthread.h>
 
 int main() {
+	Context context = Context();
+	context.setupStateTable();
+
     pthread_t keyboardScannerThread;
     pthread_t inputScannerThread;
     pthread_t gdcThread;
