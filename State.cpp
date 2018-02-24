@@ -1,6 +1,6 @@
 #include "State.hpp"
 
-State::State(string nameIn, vector<Transition> transitionsIn): name(nameIn), transitions(transitionsIn) {}
+State::State(string nameIn, vector<Transition*> transitionsIn): name(nameIn), transitions(transitionsIn) {}
 
 void State::entry(){
 	//TODO: Fill in

@@ -10,10 +10,10 @@ using namespace std;
 
 class StateTable {
 public:
-	map<string, State> states;
+	map<string, State*> states;
 	string currentState;
 
-	StateTable(map<string, State> statesIn, string currentStateIn);
+	StateTable(map<string, State*> statesIn, string currentStateIn);
 
 	void acceptEvent(Event);
 	void transitionState(State);

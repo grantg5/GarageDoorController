@@ -11,9 +11,9 @@ using namespace std;
 class State {
 public:
 	string name;
-	vector<Transition> transitions;
+	vector<Transition*> transitions;
 
-	State(string nameIn, vector<Transition> transitionsIn);
+	State(string nameIn, vector<Transition*> transitionsIn);
 
 	void entry();
 	void exit();
