@@ -13,10 +13,9 @@ public:
 	map<string, State*> states;
 	string currentState;
 
-	StateTable(map<string, State*> statesIn, string currentStateIn);
+	StateTable();
 
 	void acceptEvent(Event);
-	void transitionState(State);
 };
 
 #endif

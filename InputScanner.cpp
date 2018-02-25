@@ -1,5 +1,7 @@
 #include "InputScanner.hpp"
 #include "KeyboardScanner.hpp"
+#include "Context.hpp"
+
 #include <iostream>
 using namespace std;
 
@@ -11,5 +13,6 @@ void * InputScanner::scan(void *arg) {
 		cout << inputEvent.eventName;
 
 		//TODO: Talk w/ Kadeer on how events get sent to context.
+		Context context = Context();
 	}
 }

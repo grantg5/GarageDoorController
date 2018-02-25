@@ -6,9 +6,11 @@
 #include <map>
 using namespace std;
 
-Context::Context(): motorUp(false), motorDown(false), infraredBeam(false) {}
+Context::Context() {
+	motorUp = false;
+	motorDown = false;
+	infraredBeam = false;
 
-void Context::setupStateTable() {
 	map<string, State*> states;
 
 	//Closed
@@ -46,7 +48,9 @@ void Context::setupStateTable() {
 	statePausedClosingTransitionVector.push_back(new Transition("ButtonPress", "StateOpening"));
 	states.insert(make_pair("StatePausedClosing", new State("StatePausedClosing", statePausedClosingTransitionVector)));
 
-	stateTable = StateTable(states, "StateClosed");
+	stateTable = StateTable();
+	stateTable.states = states;
+	stateTable.currentState = "StateClosed";
 }
 
 void * Context::run(void *arg) {

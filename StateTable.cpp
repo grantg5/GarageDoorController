@@ -1,11 +1,24 @@
 #include "StateTable.hpp"
 
-StateTable::StateTable(map<string, State*> statesIn, string currentStateIn): states(statesIn), currentState(currentStateIn) {}
+#include <string>
+#include <map>
+using namespace std;
+
+StateTable::StateTable() {}
 
 void StateTable::acceptEvent(Event event) {
-	//TODO: Fill in
-}
+	State* fullCurrentState = states[currentState];
 
-void StateTable::transitionState(State nextState) {
-	//TODO: Fill in
+	string nextStateString = "";
+	for (int i = 0; i < fullCurrentState->transitions.size(); i++) {
+		Transition* iTransition = fullCurrentState->transitions[i];
+		if (iTransition->eventId == event.eventName) {
+			nextStateString = iTransition->nextState;
+			break;
+		}
+	}
+
+	if (nextStateString != "") {
+		currentState = nextStateString;
+	}
 }

@@ -6,7 +6,6 @@
 
 int main() {
 	Context context = Context();
-	context.setupStateTable();
 
     pthread_t keyboardScannerThread;
     pthread_t inputScannerThread;

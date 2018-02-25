@@ -10,7 +10,6 @@ class Context {
 
 		Context();
 
-		void setupStateTable();
 		static void * run(void* arg);
 		void acceptEvent(Event);
 		void startTimer(int);
