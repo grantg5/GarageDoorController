@@ -3,14 +3,17 @@
 
 class Context {
 	public:
-		bool motorUp;
-		bool motorDown;
-		bool infraredBeam;
-		StateTable stateTable;
+		static bool motorUp;
+		static bool motorDown;
+		static bool infraredBeam;
+		static int position;
+		static bool toRaise;
+		static StateTable stateTable;
 
 		Context();
 
-		static void * run(void* arg);
+		static void setupStateTable();
+		//static void * run(void* arg);
 		void acceptEvent(Event);
-		void startTimer(int);
+		static void * startTimer(void* arg);
 };

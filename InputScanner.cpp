@@ -6,13 +6,14 @@
 using namespace std;
 
 void * InputScanner::scan(void *arg) {
+	Context context = Context();
+
 	while(1) {
 		KeyboardScanner keyScanner = KeyboardScanner();
 		Event inputEvent = keyScanner.scanInput();
-		cout << inputEvent.keyPressed;
-		cout << inputEvent.eventName;
 
-		//TODO: Talk w/ Kadeer on how events get sent to context.
-		Context context = Context();
+		if (inputEvent.eventName != "NoEvent") {
+			context.acceptEvent(inputEvent);
+		}
 	}
 }

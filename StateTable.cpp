@@ -10,7 +10,7 @@ void StateTable::acceptEvent(Event event) {
 	State* fullCurrentState = states[currentState];
 
 	string nextStateString = "";
-	for (int i = 0; i < fullCurrentState->transitions.size(); i++) {
+	for (unsigned int i = 0; i < fullCurrentState->transitions.size(); i++) {
 		Transition* iTransition = fullCurrentState->transitions[i];
 		if (iTransition->eventId == event.eventName) {
 			nextStateString = iTransition->nextState;
@@ -21,4 +21,6 @@ void StateTable::acceptEvent(Event event) {
 	if (nextStateString != "") {
 		currentState = nextStateString;
 	}
+
+
 }
