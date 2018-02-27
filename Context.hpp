@@ -15,8 +15,11 @@ class Context {
 		Context();
 
 		static void setupStateTable();
+
+		//Note: moveDoor() would be deleted and run() would be un-commented in perfect conditions.
 		//static void * run(void* arg);
 		void moveDoor(bool);
+
 		void acceptEvent(Event);
 		static void * startTimer(void* arg);
 };

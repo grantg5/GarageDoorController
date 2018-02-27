@@ -2,11 +2,9 @@
 #include "KeyboardScanner.hpp"
 #include "Context.hpp"
 
-#include <iostream>
-using namespace std;
-
 void * InputScanner::scan(void *arg) {
 	Context context = Context();
+	context.setupStateTable();
 
 	while(1) {
 		KeyboardScanner keyScanner = KeyboardScanner();
