@@ -114,39 +114,48 @@ void * Context::run(void *arg) {
 //		 to be careful if he's walking under a closing garage door.
 void Context::moveDoor(bool opening) {
 	if (opening) {
+		cout << "Opening Door" << endl;
 		int count = 1;
 		Context::motorUp = true;
 
 		while (count <= 10) {
-			cout << count << endl;
+			cout << "Door position: " << count << endl;
 			usleep(999999);
 			count++;
 		}
 
 		Context::motorUp = false;
+		cout << "Door's Open" << endl;
 	} else {
+		cout << "Closing Door" << endl;
 		int count = 10;
 		Context::motorDown = true;
 		Context::infraredBeam = true;
 
 		while (count >= 1) {
-			cout << count << endl;
+			cout << "Door position: " << count << endl;
 			usleep(999999);
 			count--;
 		}
 
 		Context::infraredBeam = false;
 		Context::motorDown = false;
+		cout << "Door's Closed" << endl;
 	}
 }
 
 void Context::acceptEvent(Event event) {
 	//TODO: Keep this like this, if it doesn't work, change to just check current state.
 	//		If closed, count to 10 then open. If open, vice versa.
-	stateTable.acceptEvent(event);
+	//stateTable.acceptEvent(event);
+
 	if (stateTable.currentState == "StateClosed") {
+		stateTable.currentState = "StateOpening";
 		Context::moveDoor(true);
+		stateTable.currentState = "StateOpen";
 	} else {
+		stateTable.currentState = "StateClosing";
 		Context::moveDoor(false);
+		stateTable.currentState = "StateClosed";
 	}
 }
