@@ -3,9 +3,9 @@
 Transition::Transition(string eventIdIn, string nextStateIn): eventId(eventIdIn), nextState(nextStateIn) {}
 
 bool Transition::guard() {
-	//TODO: fill in
+	// Note: Guards are not implemented as of R1.
 }
 
 string Transition::acceptEvent() {
-	//TODO: fill in
+	//Note: This has not been implemented as of R1.
 }

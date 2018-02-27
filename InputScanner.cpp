@@ -5,6 +5,7 @@
 #include <iostream>
 using namespace std;
 
+// Note: The below method will be used when proper Context/InputScanner threading is implemented.
 /*
 void * InputScanner::scan(void *arg) {
 	Context context = Context();
@@ -21,6 +22,7 @@ void * InputScanner::scan(void *arg) {
 }
 */
 
+// Note: The below code will be deleted and replaced by the above function when threading is implemented.
 void InputScanner::scan() {
 	Context context = Context();
 	context.setupStateTable();

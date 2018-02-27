@@ -16,15 +16,14 @@ void StateTable::acceptEvent(Event event) {
 	// state, that handles said event.
 	string nextStateString = "";
 	for (unsigned int i = 0; i < fullCurrentState->transitions.size(); i++) {
-		cout << "In for" << endl; //DEBUG
-		Transition* iTransition = fullCurrentState->transitions[i]; //TODO; Breaking here.
-		cout << iTransition->eventId << endl;
+		Transition* iTransition = fullCurrentState->transitions[i];
 		if (iTransition->eventId == event.eventName) {
 			nextStateString = iTransition->nextState;
 			break;
 		}
 	}
 
+	// If the above loop finds something, transitions to the state found.
 	if (nextStateString != "") {
 		currentState = nextStateString;
 	}

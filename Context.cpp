@@ -33,7 +33,7 @@ void Context::setupStateTable() {
 	*/
 
 	//Closed (backup version)
-	vector<Transition*> stateClosedTransitionVector(1);
+	vector<Transition*> stateClosedTransitionVector(0);
 	stateClosedTransitionVector.push_back(new Transition("ButtonPress", "StateOpen"));
 	states.insert(make_pair("StateClosed", new State("StateClosed", stateClosedTransitionVector)));
 
@@ -59,7 +59,7 @@ void Context::setupStateTable() {
 	*/
 
 	//Open (backup version)
-	vector<Transition*> stateOpenTransitionVector(1);
+	vector<Transition*> stateOpenTransitionVector(0);
 	stateOpenTransitionVector.push_back(new Transition("ButtonPress", "StateClosing"));
 	states.insert(make_pair("StateOpen", new State("StateOpen", stateOpenTransitionVector)));
 
@@ -145,10 +145,10 @@ void Context::moveDoor(bool opening) {
 }
 
 void Context::acceptEvent(Event event) {
-	//TODO: Keep this like this, if it doesn't work, change to just check current state.
-	//		If closed, count to 10 then open. If open, vice versa.
+	// Note: This call uses stateTable logic to handle transitions, it is not working as of R1.
 	//stateTable.acceptEvent(event);
 
+	// The below code is used instead to transition between closed and open.
 	if (stateTable.currentState == "StateClosed") {
 		stateTable.currentState = "StateOpening";
 		Context::moveDoor(true);
