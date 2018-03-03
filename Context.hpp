@@ -13,10 +13,5 @@ class Context {
 		static queue<Event> * contextQueue;
 
 		Context();
-
-		static void setupStateTable();
-
-		static void run(Event);
-
-		void acceptEvent(Event);
+		static void * run(void *arg);
 };

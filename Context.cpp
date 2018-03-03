@@ -69,10 +69,12 @@ Context::Context() {
 }
 
 // Method for execution of GarageDoorController state machine
-void Context::run(Event eventIn) {
+void * Context::run(void *arg) {
+	/*
 	cout << "Run with event " + eventIn.eventName << endl;
 	// If we could get threading working, the input scanner thread would write to this queue itself
 	::contextQueue->push(eventIn);
+	*/
 
 	while(true) {
 		// Ingest event from event queue if one exists
