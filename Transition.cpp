@@ -1,11 +1,16 @@
 #include "Transition.hpp"
 
-Transition::Transition(string eventIdIn, string nextStateIn): eventId(eventIdIn), nextState(nextStateIn) {}
-
-bool Transition::guard() {
-	//TODO: fill in
+/*
+ * Transition objects contain the event information and the string indicating what the next state is
+ */
+Transition::Transition(string eventIdIn, string nextStateIn)
+{
+	eventId = eventIdIn;
+	nextState = nextStateIn;
 }
 
-string Transition::acceptEvent() {
-	//TODO: fill in
-}
+// currently unimplemented guards
+bool Transition::guard() {}
+
+// currently unimplemented accepting logic if entry and exit states existed
+string Transition::acceptEvent() {}

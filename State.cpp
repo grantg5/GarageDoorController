@@ -2,15 +2,11 @@
 
 State::State(string nameIn, vector<Transition*> transitionsIn): name(nameIn), transitions(transitionsIn) {}
 
-void State::entry(){
-	//TODO: Fill in
-	//PROBLEM? How to have seperate entry & exit functions for each state?
-}
+// logic for any entry methods would go here
+void State::entry(){}
 
-void State::exit() {
-	//TODO: Fill in
-}
+// logic for any exit methods would go here
+void State::exit() {}
 
-string State::accept(Event event) {
-	//TODO: Fill in
-}
+// logic to receive an event was implemented in the context instead because pointers are hard
+string State::accept(Event event) {}

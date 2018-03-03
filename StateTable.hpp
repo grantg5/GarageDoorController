@@ -15,7 +15,7 @@ public:
 
 	StateTable();
 
-	void acceptEvent(Event);
+	bool acceptEvent(Event *);
 };
 
 #endif
