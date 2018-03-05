@@ -76,6 +76,9 @@ void * Context::run(void *arg) {
 	::contextQueue->push(eventIn);
 	*/
 
+	//TODO: Instead opening or closing door here, do it somewhere else.
+	//Still have no idea how they got around the sleep() error...
+
 	while(true) {
 		// Ingest event from event queue if one exists
 		if (!::contextQueue->empty()){
