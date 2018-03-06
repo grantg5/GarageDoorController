@@ -85,9 +85,7 @@ void * Context::run(void *arg) {
 			Event event = Context::contextQueue->front();
 			Context::contextQueue->pop();
 			//send event into the state table
-			if(!::stateTable->acceptEvent(new Event(event.keyPressed, event.eventName))){
-				break;
-			}
+			::stateTable->acceptEvent(new Event(event.keyPressed, event.eventName));
 		}
 		// Logic for timer while opening
 		if (::stateTable->currentState == "StateOpening"){
@@ -97,7 +95,7 @@ void * Context::run(void *arg) {
 			if (position == 10){
 				// self trigger an even for the door being fully open
 				::stateTable->acceptEvent(new Event('o', "FullyOpen"));
-				break;
+				//break;
 			}
 		}
 		// Logic for timer while closing
@@ -108,7 +106,7 @@ void * Context::run(void *arg) {
 			if (position == 0) {
 				// self trigger an even for the door being fully closed
 				::stateTable->acceptEvent(new Event('c', "FullyClosed"));
-				break;
+				//break;
 			}
 		}
 		// Sleep for one second to mimic the cycling
