@@ -5,7 +5,7 @@
 #include <queue>
 using namespace std;
 
-queue<Event> * Context::contextQueue;
+//queue<Event> ** contextQueuePointer = &Context::contextQueue;
 
 /*
  * Input Scanner receives input from the keyboard scanner in the form of events

@@ -18,7 +18,7 @@ bool Context::toRaise = true;
 
 StateTable * stateTable = new StateTable();
 
-queue<Event> * contextQueue = new queue<Event>();
+queue<Event>* Context::contextQueue = new queue<Event>();
 
 Context::Context() {
 	// Initializing our state machine's states
@@ -81,9 +81,9 @@ void * Context::run(void *arg) {
 
 	while(true) {
 		// Ingest event from event queue if one exists
-		if (!::contextQueue->empty()){
-			Event event = ::contextQueue->front();
-			::contextQueue->pop();
+		if (!Context::contextQueue->empty()){
+			Event event = Context::contextQueue->front();
+			Context::contextQueue->pop();
 			//send event into the state table
 			if(!::stateTable->acceptEvent(new Event(event.keyPressed, event.eventName))){
 				break;
