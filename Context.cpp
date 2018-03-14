@@ -15,6 +15,7 @@ bool Context::motorDown = false;
 bool Context::infraredBeam = false;
 int Context::position = 0;
 bool Context::toRaise = true;
+bool Context::simulation = false;
 
 StateTable * stateTable = new StateTable();
 

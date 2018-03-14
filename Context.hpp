@@ -4,6 +4,7 @@
 
 class Context {
 	public:
+		static bool simulation;
 		static bool motorUp;
 		static bool motorDown;
 		static bool infraredBeam;
