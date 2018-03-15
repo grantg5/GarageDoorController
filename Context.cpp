@@ -1,6 +1,7 @@
 #include "Context.hpp"
 #include "State.hpp"
 #include "Transition.hpp"
+#include "GPIOController.hpp"
 
 #include <iostream>
 #include <string>
@@ -12,6 +13,8 @@ using namespace std;
 
 bool Context::motorUp = false;
 bool Context::motorDown = false;
+bool Context::doorOpen = false;
+bool Context::doorClosed = true;
 bool Context::infraredBeam = false;
 int Context::position = 0;
 bool Context::toRaise = true;
@@ -71,6 +74,8 @@ Context::Context() {
 
 // Method for execution of GarageDoorController state machine
 void * Context::run(void *arg) {
+
+	//TODO: Rip the count out, the hardware handles all counting. Add functions to see full close, open, motor up/down, etc.
 	while(true) {
 		// Ingest event from event queue if one exists
 		if (!Context::contextQueue->empty()){
@@ -79,29 +84,44 @@ void * Context::run(void *arg) {
 			//send event into the state table
 			::stateTable->acceptEvent(new Event(event.keyPressed, event.eventName));
 		}
-		// Logic for timer while opening
-		if (::stateTable->currentState == "StateOpening"){
-			position++;
-			cout << "Opening... ";
-			cout << position << endl;
-			if (position == 10){
-				// self trigger an even for the door being fully open
-				::stateTable->acceptEvent(new Event('o', "FullyOpen"));
-				//break;
+
+		if (Context::simulation) {
+			// Logic for timer while opening
+			if (::stateTable->currentState == "StateOpening"){
+				position++;
+				cout << "Opening... ";
+				cout << position << endl;
+				if (position == 10){
+					// self trigger an even for the door being fully open
+					::stateTable->acceptEvent(new Event('o', "FullyOpen"));
+				}
 			}
-		}
-		// Logic for timer while closing
-		if (::stateTable->currentState == "StateClosing"){
-			position--;
-			cout << "Closing... ";
-			cout << position << endl;
-			if (position == 0) {
-				// self trigger an even for the door being fully closed
-				::stateTable->acceptEvent(new Event('c', "FullyClosed"));
-				//break;
+			// Logic for timer while closing
+			if (::stateTable->currentState == "StateClosing"){
+				Context::infraredBeam = true;
+				position--;
+				cout << "Closing... ";
+				cout << position << endl;
+
+				if (position == 0) {
+					// self trigger an even for the door being fully closed
+					::stateTable->acceptEvent(new Event('c', "FullyClosed"));
+					Context::infraredBeam = false;
+				}
 			}
+
+			// Sleep for one second to mimic the cycling
+			usleep(999999);
+		} else {
+			if (::stateTable->currentState == "StateOpening") {
+				GPIOController::raiseDoor();
+			} else if (::stateTable->currentState == "StateClosing") {
+				GPIOController::lowerDoor();
+			} else {
+				GPIOController::stopDoor();
+			}
+
+			usleep(1000000);
 		}
-		// Sleep for one second to mimic the cycling
-		usleep(999999);
 	}
 }

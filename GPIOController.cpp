@@ -92,10 +92,10 @@ void GPIOController::scanA() {
 
 Event GPIOController::translateInput() {
 	if (CHECK_BIT(GPIOController::portAVal, 0) == 1) {
-		return Event('o', "DoorOpen");
+		return Event('o', "FullyOpen");
 	}
 	if (CHECK_BIT(GPIOController::portAVal, 1) == 1) {
-		return Event('c', "DoorClosed");
+		return Event('c', "FullyClosed");
 	}
 	if (CHECK_BIT(GPIOController::portAVal, 2) == 1) {
 		return Event('i', "InfraredBeam");
@@ -111,6 +111,30 @@ Event GPIOController::translateInput() {
 	return Event('n', "NoEvent");
 }
 
+void GPIOController::raiseDoor() {
+	GPIOController::portBVal |= (1u << 0); //Setting pin 9 high
+	GPIOController::portBVal &= ~(1u << 1); //Setting pin 10 low
+	Context::motorUp = true;
+}
+
+void GPIOController::lowerDoor() {
+	GPIOController::portBVal &= ~(1u << 0); //Setting pin 9 low
+	GPIOController::portBVal |= (1u << 1); //Setting pin 10 high
+	Context::motorDown = true;
+
+	GPIOController::portBVal |= (1u << 2); //Setting pin 11 high (for the beam)
+	Context::infraredBeam = true;
+}
+
+void GPIOController::stopDoor() {
+	GPIOController::portBVal &= ~(1u << 0); //Setting pin 9 low
+	GPIOController::portBVal &= ~(1u << 1); //Setting pin 10 low
+	Context::motorUp = false;
+	Context::motorDown = false;
+
+	GPIOController::portBVal &= ~(1u << 2); //Setting pin 11 low (for the beam)
+	Context::infraredBeam = false;
+}
 
 
 

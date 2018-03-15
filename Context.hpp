@@ -7,6 +7,8 @@ class Context {
 		static bool simulation;
 		static bool motorUp;
 		static bool motorDown;
+		static bool doorOpen;
+		static bool doorClosed;
 		static bool infraredBeam;
 		static int position;
 		static bool toRaise;
