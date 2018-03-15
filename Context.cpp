@@ -71,15 +71,6 @@ Context::Context() {
 
 // Method for execution of GarageDoorController state machine
 void * Context::run(void *arg) {
-	/*
-	cout << "Run with event " + eventIn.eventName << endl;
-	// If we could get threading working, the input scanner thread would write to this queue itself
-	::contextQueue->push(eventIn);
-	*/
-
-	//TODO: Instead opening or closing door here, do it somewhere else.
-	//Still have no idea how they got around the sleep() error...
-
 	while(true) {
 		// Ingest event from event queue if one exists
 		if (!Context::contextQueue->empty()){

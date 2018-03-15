@@ -1,7 +1,8 @@
 /**
- * Thanks to Zachary Campanella for explaining the hardware component of this project in simple terms.
+ * Thanks to Zachary Campanella & Emily Filmer for help and
+ * for explaining the hardware component of this project in simple terms.
  *
- * Thanks to Ronnie James Dio for the variable name inspiration, and for guiding young JB in
+ * Thanks to Ronnie James Dio for inspiring digital input/output, and for guiding young JB in
  * Tenacious D and the Pick of Destiny.
  */
 
@@ -16,9 +17,11 @@
 using namespace std;
 
 
-#define DIO_A 0x288		//input
-#define DIO_B 0x289		//output
+#define DIO_A 0x288	//input
+#define DIO_B 0x289	//output
 #define DIO_CTRL 0x28B
+
+#define CHECK_BIT(var,pos) !!((var) & (1<<(pos)))
 
 uintptr_t GPIOController::ctrl;
 uintptr_t GPIOController::portA;
@@ -75,13 +78,37 @@ bool GPIOController::mapPorts() {
 
 		return true;
 
-		//TODO: Use in16(ctrlHandle) and out16(ctrlHandle) (or whatever bit size is necicarry to send stuff).
-
-		//TODO: define pA_data = out, pB_data = in. call in8(pB_data), to get uint8_t. Mask to find pin #.
 		//TODO; Look @ this to find pA and pB pg. 26 http://www.se.rit.edu/~swen-563/resources/helios/Helios%20User%20Manual.pdf
 	}
 
 	return false;
+}
+
+void GPIOController::scanA() {
+	if (!Context::simulation) {
+		GPIOController::portAVal = in8(GPIOController::portA);
+	}
+}
+
+Event GPIOController::translateInput() {
+	if (CHECK_BIT(GPIOController::portAVal, 0) == 1) {
+		return Event('o', "DoorOpen");
+	}
+	if (CHECK_BIT(GPIOController::portAVal, 1) == 1) {
+		return Event('c', "DoorClosed");
+	}
+	if (CHECK_BIT(GPIOController::portAVal, 2) == 1) {
+		return Event('i', "InfraredBeam");
+	}
+	if (CHECK_BIT(GPIOController::portAVal, 3) == 1) {
+		return Event('m', "Overcurrent");
+	}
+	if (CHECK_BIT(GPIOController::portAVal, 4) == 1) {
+		return Event('r', "ButtonPress");
+	}
+
+	//create no event that will be ignored further in execution
+	return Event('n', "NoEvent");
 }
 
 

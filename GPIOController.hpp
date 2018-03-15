@@ -1,3 +1,4 @@
+#include "Event.hpp"
 #include <stdint.h>
 
 #ifndef GPIOCONTROLLER_H_
@@ -14,6 +15,8 @@ public:
 	static void init();
 	static bool fetchPermission();
 	static bool mapPorts();
+	static void scanA();
+	static Event translateInput();
 };
 
 #endif /* GPIOCONTROLLER_H_ */
