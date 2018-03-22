@@ -12,7 +12,7 @@ public:
 	static int portAVal;
 	static int portBVal;
 
-	static void init();
+	static bool init();
 	static bool fetchPermission();
 	static bool mapPorts();
 	static void scanA();

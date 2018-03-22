@@ -29,7 +29,7 @@ uintptr_t GPIOController::portB;
 int GPIOController::portAVal = 0x0;
 int GPIOController::portBVal = 0x0;
 
-void GPIOController::init() {
+bool GPIOController::init() {
 	bool *contextSimulationPointer = &Context::simulation;
 	bool contextSimulation = *contextSimulationPointer;
 
