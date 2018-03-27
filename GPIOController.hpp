@@ -9,8 +9,8 @@ public:
 	static uintptr_t ctrl;
 	static uintptr_t portA;
 	static uintptr_t portB;
-	static int portAVal;
-	static int portBVal;
+	static uint8_t portAVal;
+	static uint8_t portBVal;
 
 	static bool init();
 	static bool fetchPermission();

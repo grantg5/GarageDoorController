@@ -113,12 +113,14 @@ void * Context::run(void *arg) {
 			// Sleep for one second to mimic the cycling
 			usleep(999999);
 		} else {
+			cout << ::stateTable->currentState << endl;
 			if (::stateTable->currentState == "StateOpening") {
+				cout << "in if" << endl;
 				GPIOController::raiseDoor();
 			} else if (::stateTable->currentState == "StateClosing") {
 				GPIOController::lowerDoor();
 			} else {
-				GPIOController::stopDoor();
+				//GPIOController::stopDoor();
 			}
 
 			usleep(1000000);

@@ -26,8 +26,8 @@ using namespace std;
 uintptr_t GPIOController::ctrl;
 uintptr_t GPIOController::portA;
 uintptr_t GPIOController::portB;
-int GPIOController::portAVal = 0x0;
-int GPIOController::portBVal = 0x0;
+uint8_t GPIOController::portAVal = 0x0;
+uint8_t GPIOController::portBVal = 0x0;
 
 bool GPIOController::init() {
 	bool *contextSimulationPointer = &Context::simulation;
@@ -42,10 +42,14 @@ bool GPIOController::init() {
 
 			out8(GPIOController::portB, GPIOController::portBVal);
 			sleep(1);
-			GPIOController::portBVal |= (1u << 7); //Setting pin 5 high
+			GPIOController::portBVal |= (1u << 7); //Setting pin 16 high
 			out8(GPIOController::portB, GPIOController::portBVal);
+
+			return true;
 		}
 	}
+
+	return false;
 }
 
 bool GPIOController::fetchPermission() {
@@ -91,12 +95,6 @@ void GPIOController::scanA() {
 }
 
 Event GPIOController::translateInput() {
-	if (CHECK_BIT(GPIOController::portAVal, 0) == 1) {
-		return Event('o', "FullyOpen");
-	}
-	if (CHECK_BIT(GPIOController::portAVal, 1) == 1) {
-		return Event('c', "FullyClosed");
-	}
 	if (CHECK_BIT(GPIOController::portAVal, 2) == 1) {
 		return Event('i', "InfraredBeam");
 	}
@@ -106,27 +104,49 @@ Event GPIOController::translateInput() {
 	if (CHECK_BIT(GPIOController::portAVal, 4) == 1) {
 		return Event('r', "ButtonPress");
 	}
+	if (CHECK_BIT(GPIOController::portAVal, 0) == 1) {
+		return Event('o', "FullyOpen");
+	}
+	if (CHECK_BIT(GPIOController::portAVal, 1) == 1) {
+		return Event('c', "FullyClosed");
+	}
 
 	//create no event that will be ignored further in execution
 	return Event('n', "NoEvent");
 }
 
 void GPIOController::raiseDoor() {
+	cout << "in raiseDoor" << endl;
+	cout << "Port b before" << endl;
+	cout << GPIOController::portBVal << endl;
 	GPIOController::portBVal |= (1u << 0); //Setting pin 9 high
+	cout << "pin 9 set" << endl;
 	GPIOController::portBVal &= ~(1u << 1); //Setting pin 10 low
+	cout << "pin 10 set" << endl;
+
+	uint8_t testInt = 0;
+
+	out8(GPIOController::portB, testInt);
+
+	cout << "outputted" << endl;
 	Context::motorUp = true;
+	cout << "Port b after" << endl;
+	cout << GPIOController::portBVal << endl;
 }
 
 void GPIOController::lowerDoor() {
+	cout << "in lowerDoor" << endl;
 	GPIOController::portBVal &= ~(1u << 0); //Setting pin 9 low
 	GPIOController::portBVal |= (1u << 1); //Setting pin 10 high
 	Context::motorDown = true;
 
 	GPIOController::portBVal |= (1u << 2); //Setting pin 11 high (for the beam)
 	Context::infraredBeam = true;
+	out8(GPIOController::portB, GPIOController::portBVal);
 }
 
 void GPIOController::stopDoor() {
+	cout << "In stop door" << endl; //DEBUG
 	GPIOController::portBVal &= ~(1u << 0); //Setting pin 9 low
 	GPIOController::portBVal &= ~(1u << 1); //Setting pin 10 low
 	Context::motorUp = false;
@@ -134,6 +154,7 @@ void GPIOController::stopDoor() {
 
 	GPIOController::portBVal &= ~(1u << 2); //Setting pin 11 low (for the beam)
 	Context::infraredBeam = false;
+	out8(GPIOController::portB, GPIOController::portBVal);
 }
 
 

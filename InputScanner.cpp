@@ -41,6 +41,7 @@ void * InputScanner::scan(void *arg) {
 			}
 		} else {
 			if (!gpioInitialized) {
+				cout << "init failed" << endl;
 				break;
 			}
 			/*
