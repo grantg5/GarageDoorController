@@ -56,7 +56,7 @@ Context::Context() {
 	//Closing
 	vector<Transition*> stateClosingTransitionVector(0);
 	stateClosingTransitionVector.push_back(new Transition("FullyClosed", "StateClosed"));
-	stateClosingTransitionVector.push_back(new Transition("InfraredBeam", "StatePausedClosing"));
+	stateClosingTransitionVector.push_back(new Transition("InfraredBeam", "StateOpening"));
 	stateClosingTransitionVector.push_back(new Transition("ButtonPress", "StatePausedClosing"));
 	stateClosingTransitionVector.push_back(new Transition("Overcurrent", "StateOpening"));
 	states.insert(make_pair("StateClosing", new State("StateClosing", stateClosingTransitionVector)));
@@ -74,8 +74,9 @@ Context::Context() {
 
 // Method for execution of GarageDoorController state machine
 void * Context::run(void *arg) {
+	GPIOController gpioController = GPIOController();
+	gpioController.init();
 
-	//TODO: Rip the count out, the hardware handles all counting. Add functions to see full close, open, motor up/down, etc.
 	while(true) {
 		// Ingest event from event queue if one exists
 		if (!Context::contextQueue->empty()){
@@ -113,17 +114,13 @@ void * Context::run(void *arg) {
 			// Sleep for one second to mimic the cycling
 			usleep(999999);
 		} else {
-			cout << ::stateTable->currentState << endl;
 			if (::stateTable->currentState == "StateOpening") {
-				cout << "in if" << endl;
-				GPIOController::raiseDoor();
+				gpioController.raiseDoor();
 			} else if (::stateTable->currentState == "StateClosing") {
-				GPIOController::lowerDoor();
+				gpioController.lowerDoor();
 			} else {
-				//GPIOController::stopDoor();
+				gpioController.stopDoor();
 			}
-
-			usleep(1000000);
 		}
 	}
 }

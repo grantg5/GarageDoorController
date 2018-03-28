@@ -5,15 +5,8 @@
 
 #include <iostream>
 #include <queue>
-#include <time.h>
 #include <unistd.h>
 using namespace std;
-
-timespec openTimer;
-timespec closeTimer;
-timespec infraredTimer;
-timespec motorTimer;
-timespec pushButtonTimer;
 
 /*
  * Input Scanner receives input from the keyboard scanner in the form of events
@@ -23,10 +16,13 @@ void * InputScanner::scan(void *arg) {
 	int prevPortAVal = 0x0;
 	bool gpioInitialized = true;
 
+	GPIOController gpioController = GPIOController();
+
 	if (!Context::simulation) {
-		if (!GPIOController::init()) {
+		if (!gpioController.init()) {
 			gpioInitialized = false;
 			cout << "GPIO Controller initialization failed.";
+			return 0;
 		}
 	}
 
@@ -40,27 +36,15 @@ void * InputScanner::scan(void *arg) {
 				Context::contextQueue->push(inputEvent);
 			}
 		} else {
-			if (!gpioInitialized) {
-				cout << "init failed" << endl;
-				break;
-			}
-			/*
-			clock_gettime(CLOCK_MONOTONIC, &openTimer);
-			clock_gettime(CLOCK_MONOTONIC, &closeTimer);
-			clock_gettime(CLOCK_MONOTONIC, &pushButtonTimer);
-			clock_gettime(CLOCK_MONOTONIC, &infraredTimer);
-			clock_gettime(CLOCK_MONOTONIC, &motorTimer);
-			*/
+			gpioController.scanA();
 
-			GPIOController::scanA();
-
-			if (GPIOController::portAVal != prevPortAVal) {
-				prevPortAVal = GPIOController::portAVal;
-				Event inputEvent = GPIOController::translateInput();
+			if (gpioController.portAVal != prevPortAVal) {
+				prevPortAVal = gpioController.portAVal;
+				Event inputEvent = gpioController.translateInput();
 				Context::contextQueue->push(inputEvent);
 			}
 		}
 
-		usleep(300000);
+		usleep(200000);
 	}
 }

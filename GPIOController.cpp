@@ -1,9 +1,6 @@
 /**
  * Thanks to Zachary Campanella & Emily Filmer for help and
  * for explaining the hardware component of this project in simple terms.
- *
- * Thanks to Ronnie James Dio for inspiring digital input/output, and for guiding young JB in
- * Tenacious D and the Pick of Destiny.
  */
 
 #include "GPIOController.hpp"
@@ -13,21 +10,22 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <hw/inout.h>
+#include <time.h>
 #include <iostream>
 using namespace std;
-
 
 #define DIO_A 0x288	//input
 #define DIO_B 0x289	//output
 #define DIO_CTRL 0x28B
 
 #define CHECK_BIT(var,pos) !!((var) & (1<<(pos)))
+#define BOUNCE 0.2 // In seconds, how soon after receiving an input should a new input be accepted.
 
-uintptr_t GPIOController::ctrl;
-uintptr_t GPIOController::portA;
-uintptr_t GPIOController::portB;
-uint8_t GPIOController::portAVal = 0x0;
-uint8_t GPIOController::portBVal = 0x0;
+timespec openTimer;
+timespec closeTimer;
+timespec infraredTimer;
+timespec motorTimer;
+timespec pushButtonTimer;
 
 bool GPIOController::init() {
 	bool *contextSimulationPointer = &Context::simulation;
@@ -35,15 +33,21 @@ bool GPIOController::init() {
 
 	if (!contextSimulation) {
 		if (fetchPermission() && mapPorts()) {
-			out8(GPIOController::ctrl, 0x91);
+			clock_gettime(CLOCK_MONOTONIC, &openTimer);
+			clock_gettime(CLOCK_MONOTONIC, &closeTimer);
+			clock_gettime(CLOCK_MONOTONIC, &pushButtonTimer);
+			clock_gettime(CLOCK_MONOTONIC, &infraredTimer);
+			clock_gettime(CLOCK_MONOTONIC, &motorTimer);
 
-			GPIOController::portAVal = 0x0;
-			GPIOController::portBVal = 0x0;
+			out8(ctrl, 0x91);
 
-			out8(GPIOController::portB, GPIOController::portBVal);
+			portAVal = 0x0;
+			portBVal = 0x0;
+
+			out8(portB, portBVal);
 			sleep(1);
-			GPIOController::portBVal |= (1u << 7); //Setting pin 16 high
-			out8(GPIOController::portB, GPIOController::portBVal);
+			portBVal |= (1u << 7); //Setting pin 16 high
+			out8(portB, portBVal);
 
 			return true;
 		}
@@ -63,19 +67,19 @@ bool GPIOController::fetchPermission() {
 
 bool GPIOController::mapPorts() {
 	if (fetchPermission()) {
-		GPIOController::ctrl = mmap_device_io(1, DIO_CTRL);
-		GPIOController::portA = mmap_device_io(1, DIO_A);
-		GPIOController::portB = mmap_device_io(1, DIO_B);
+		ctrl = mmap_device_io(1, DIO_CTRL);
+		portA = mmap_device_io(1, DIO_A);
+		portB = mmap_device_io(1, DIO_B);
 
-		if (GPIOController::ctrl == MAP_DEVICE_FAILED) {
+		if (ctrl == MAP_DEVICE_FAILED) {
 			cout << "ctrl mapping failed." << endl;
 			return false;
 		}
-		if (GPIOController::portA == MAP_DEVICE_FAILED) {
+		if (portA == MAP_DEVICE_FAILED) {
 			cout << "port A mapping failed" << endl;
 			return false;
 		}
-		if (GPIOController::portB == MAP_DEVICE_FAILED) {
+		if (portB == MAP_DEVICE_FAILED) {
 			cout << "port B mapping failed" << endl;
 			return false;
 		}
@@ -90,25 +94,61 @@ bool GPIOController::mapPorts() {
 
 void GPIOController::scanA() {
 	if (!Context::simulation) {
-		GPIOController::portAVal = in8(GPIOController::portA);
+		portAVal = in8(portA);
 	}
 }
 
 Event GPIOController::translateInput() {
-	if (CHECK_BIT(GPIOController::portAVal, 2) == 1) {
-		return Event('i', "InfraredBeam");
+	double timeElapsed;
+	timespec tempTimer;
+	clock_gettime(CLOCK_MONOTONIC, &tempTimer);
+
+	if (CHECK_BIT(portAVal, 2) == 1) {
+		cout << "beam" << endl; //debug
+		timeElapsed = (tempTimer.tv_sec - infraredTimer.tv_sec);
+		timeElapsed += (tempTimer.tv_nsec - infraredTimer.tv_nsec) / 1000000000.0;
+
+		if (timeElapsed >= BOUNCE) {
+			clock_gettime(CLOCK_MONOTONIC, &infraredTimer);
+			return Event('i', "InfraredBeam");
+		}
 	}
-	if (CHECK_BIT(GPIOController::portAVal, 3) == 1) {
-		return Event('m', "Overcurrent");
+	if (CHECK_BIT(portAVal, 3) == 1) {
+		cout << "overcurrent" << endl; //debug
+		timeElapsed = (tempTimer.tv_sec - motorTimer.tv_sec);
+		timeElapsed += (tempTimer.tv_nsec - motorTimer.tv_nsec) / 1000000000.0;
+
+		if (timeElapsed >= BOUNCE) {
+			clock_gettime(CLOCK_MONOTONIC, &motorTimer);
+			return Event('m', "Overcurrent");
+		}
 	}
-	if (CHECK_BIT(GPIOController::portAVal, 4) == 1) {
-		return Event('r', "ButtonPress");
+	if (CHECK_BIT(portAVal, 4) == 1) {
+		timeElapsed = (tempTimer.tv_sec - pushButtonTimer.tv_sec);
+		timeElapsed += (tempTimer.tv_nsec - pushButtonTimer.tv_nsec) / 1000000000.0;
+
+		if (timeElapsed >= BOUNCE) {
+			clock_gettime(CLOCK_MONOTONIC, &pushButtonTimer);
+			return Event('r', "ButtonPress");
+		}
 	}
-	if (CHECK_BIT(GPIOController::portAVal, 0) == 1) {
-		return Event('o', "FullyOpen");
+	if (CHECK_BIT(portAVal, 0) == 1) {
+		timeElapsed = (tempTimer.tv_sec - openTimer.tv_sec);
+		timeElapsed += (tempTimer.tv_nsec - openTimer.tv_nsec) / 1000000000.0;
+
+		if (timeElapsed >= BOUNCE) {
+			clock_gettime(CLOCK_MONOTONIC, &openTimer);
+			return Event('o', "FullyOpen");
+		}
 	}
-	if (CHECK_BIT(GPIOController::portAVal, 1) == 1) {
-		return Event('c', "FullyClosed");
+	if (CHECK_BIT(portAVal, 1) == 1) {
+		timeElapsed = (tempTimer.tv_sec - closeTimer.tv_sec);
+		timeElapsed += (tempTimer.tv_nsec - closeTimer.tv_nsec) / 1000000000.0;
+
+		if (timeElapsed >= BOUNCE) {
+			clock_gettime(CLOCK_MONOTONIC, &closeTimer);
+			return Event('c', "FullyClosed");
+		}
 	}
 
 	//create no event that will be ignored further in execution
@@ -116,45 +156,33 @@ Event GPIOController::translateInput() {
 }
 
 void GPIOController::raiseDoor() {
-	cout << "in raiseDoor" << endl;
-	cout << "Port b before" << endl;
-	cout << GPIOController::portBVal << endl;
-	GPIOController::portBVal |= (1u << 0); //Setting pin 9 high
-	cout << "pin 9 set" << endl;
-	GPIOController::portBVal &= ~(1u << 1); //Setting pin 10 low
-	cout << "pin 10 set" << endl;
-
-	uint8_t testInt = 0;
-
-	out8(GPIOController::portB, testInt);
-
-	cout << "outputted" << endl;
+	portBVal |= (1u << 0); //Setting pin 9 high
+	portBVal &= ~(1u << 1); //Setting pin 10 low
+	portBVal &= ~(1u << 2); //Setting pin 11 low (for the beam)
+	out8(portB, portBVal);
 	Context::motorUp = true;
-	cout << "Port b after" << endl;
-	cout << GPIOController::portBVal << endl;
+	Context::infraredBeam = false;
 }
 
 void GPIOController::lowerDoor() {
-	cout << "in lowerDoor" << endl;
-	GPIOController::portBVal &= ~(1u << 0); //Setting pin 9 low
-	GPIOController::portBVal |= (1u << 1); //Setting pin 10 high
+	portBVal &= ~(1u << 0); //Setting pin 9 low
+	portBVal |= (1u << 1); //Setting pin 10 high
 	Context::motorDown = true;
 
-	GPIOController::portBVal |= (1u << 2); //Setting pin 11 high (for the beam)
+	portBVal |= (1u << 2); //Setting pin 11 high (for the beam)
 	Context::infraredBeam = true;
-	out8(GPIOController::portB, GPIOController::portBVal);
+	out8(portB, portBVal);
 }
 
 void GPIOController::stopDoor() {
-	cout << "In stop door" << endl; //DEBUG
-	GPIOController::portBVal &= ~(1u << 0); //Setting pin 9 low
-	GPIOController::portBVal &= ~(1u << 1); //Setting pin 10 low
+	portBVal &= ~(1u << 0); //Setting pin 9 low
+	portBVal &= ~(1u << 1); //Setting pin 10 low
 	Context::motorUp = false;
 	Context::motorDown = false;
 
-	GPIOController::portBVal &= ~(1u << 2); //Setting pin 11 low (for the beam)
+	portBVal &= ~(1u << 2); //Setting pin 11 low (for the beam)
 	Context::infraredBeam = false;
-	out8(GPIOController::portB, GPIOController::portBVal);
+	out8(portB, portBVal);
 }
 
 

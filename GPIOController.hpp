@@ -6,20 +6,20 @@
 
 class GPIOController {
 public:
-	static uintptr_t ctrl;
-	static uintptr_t portA;
-	static uintptr_t portB;
-	static uint8_t portAVal;
-	static uint8_t portBVal;
+	uintptr_t ctrl;
+	uintptr_t portA;
+	uintptr_t portB;
+	uint8_t portAVal;
+	uint8_t portBVal;
 
-	static bool init();
-	static bool fetchPermission();
-	static bool mapPorts();
-	static void scanA();
-	static Event translateInput();
-	static void raiseDoor();
-	static void lowerDoor();
-	static void stopDoor();
+	bool init();
+	bool fetchPermission();
+	bool mapPorts();
+	void scanA();
+	Event translateInput();
+	void raiseDoor();
+	void lowerDoor();
+	void stopDoor();
 };
 
 #endif /* GPIOCONTROLLER_H_ */
