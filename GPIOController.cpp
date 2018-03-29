@@ -16,7 +16,7 @@ using namespace std;
 
 #define DIO_A 0x288	//input
 #define DIO_B 0x289	//output
-#define DIO_CTRL 0x28B
+#define DIO_CTRL 0x28B //control
 
 #define CHECK_BIT(var,pos) !!((var) & (1<<(pos)))
 #define BOUNCE 0.2 // In seconds, how soon after receiving an input should a new input be accepted.
@@ -33,13 +33,14 @@ bool GPIOController::init() {
 
 	if (!contextSimulation) {
 		if (fetchPermission() && mapPorts()) {
+			//Init-ing timers for bounce implementation
 			clock_gettime(CLOCK_MONOTONIC, &openTimer);
 			clock_gettime(CLOCK_MONOTONIC, &closeTimer);
 			clock_gettime(CLOCK_MONOTONIC, &pushButtonTimer);
 			clock_gettime(CLOCK_MONOTONIC, &infraredTimer);
 			clock_gettime(CLOCK_MONOTONIC, &motorTimer);
 
-			out8(ctrl, 0x91);
+			out8(ctrl, 0x91); //Setting control
 
 			portAVal = 0x0;
 			portBVal = 0x0;
@@ -85,8 +86,6 @@ bool GPIOController::mapPorts() {
 		}
 
 		return true;
-
-		//TODO; Look @ this to find pA and pB pg. 26 http://www.se.rit.edu/~swen-563/resources/helios/Helios%20User%20Manual.pdf
 	}
 
 	return false;
@@ -104,7 +103,7 @@ Event GPIOController::translateInput() {
 	clock_gettime(CLOCK_MONOTONIC, &tempTimer);
 
 	if (CHECK_BIT(portAVal, 2) == 1) {
-		cout << "beam" << endl; //debug
+		//Bounce implementation used to prevent multiple signals from one button push.
 		timeElapsed = (tempTimer.tv_sec - infraredTimer.tv_sec);
 		timeElapsed += (tempTimer.tv_nsec - infraredTimer.tv_nsec) / 1000000000.0;
 
@@ -114,7 +113,6 @@ Event GPIOController::translateInput() {
 		}
 	}
 	if (CHECK_BIT(portAVal, 3) == 1) {
-		cout << "overcurrent" << endl; //debug
 		timeElapsed = (tempTimer.tv_sec - motorTimer.tv_sec);
 		timeElapsed += (tempTimer.tv_nsec - motorTimer.tv_nsec) / 1000000000.0;
 

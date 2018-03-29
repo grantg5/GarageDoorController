@@ -38,6 +38,7 @@ void * InputScanner::scan(void *arg) {
 		} else {
 			gpioController.scanA();
 
+			//if statement is a further safeguard against multiple actions resulting from one button press.
 			if (gpioController.portAVal != prevPortAVal) {
 				prevPortAVal = gpioController.portAVal;
 				Event inputEvent = gpioController.translateInput();
